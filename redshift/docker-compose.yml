@@ -6,3 +6,5 @@ services:
             - POSTGRES_USER=redshift
             - POSTGRES_PASSWORD=redshift
             - POSTGRES_DB=redshift
+        ports:
+            - 5432:5432

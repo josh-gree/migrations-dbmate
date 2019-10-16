@@ -2,8 +2,8 @@ from datetime import timedelta
 
 import airflow
 from airflow.models import DAG
+from airflow.operators.postgres_operator import PostgresOperator
 from airflow.operators.bash_operator import BashOperator
-from airflow.operators.dummy_operator import DummyOperator
 
 args = {
     'owner': 'Airflow',
@@ -11,40 +11,17 @@ args = {
 }
 
 dag = DAG(
-    dag_id='example_bash_operator',
+    dag_id='redhshift_ops',
     default_args=args,
-    schedule_interval='0 0 * * *',
-    dagrun_timeout=timedelta(minutes=60),
+    schedule_interval=None,
+    template_searchpath='/usr/local/airflow/dags'
 )
 
-run_this_last = DummyOperator(
-    task_id='run_this_last',
-    dag=dag,
+pg_op = PostgresOperator(
+    task_id = 'pg_op',
+    sql='sample.sql',
+    postgres_conn_id='pg_conn',
+    dag=dag
 )
 
-# [START howto_operator_bash]
-run_this = BashOperator(
-    task_id='run_after_loop',
-    bash_command='echo 1',
-    dag=dag,
-)
-# [END howto_operator_bash]
-
-run_this >> run_this_last
-
-for i in range(3):
-    task = BashOperator(
-        task_id='runme_' + str(i),
-        bash_command='echo "{{ task_instance_key_str }}" && sleep 1',
-        dag=dag,
-    )
-    task >> run_this
-
-# [START howto_operator_bash_template]
-also_run_this = BashOperator(
-    task_id='also_run_this',
-    bash_command='echo "run_id={{ run_id }} | dag_run={{ dag_run }}"',
-    dag=dag,
-)
-# [END howto_operator_bash_template]
-also_run_this >> run_this_last
+pg_op
