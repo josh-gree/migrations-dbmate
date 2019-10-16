@@ -1,0 +1,31 @@
+version: '2.1'
+services:
+    postgresA:
+        image: postgres:9.6
+        environment:
+            - POSTGRES_USER=airflowA
+            - POSTGRES_PASSWORD=airflowA
+            - POSTGRES_DB=airflowA
+
+    webserverA:
+        image: puckel/docker-airflow:1.10.4
+        restart: always
+        depends_on:
+            - postgresA
+        environment:
+            - LOAD_EX=n
+            - EXECUTOR=Local
+            - POSTGRES_USER=airflowA
+            - POSTGRES_PASSWORD=airflowA
+            - POSTGRES_DB=airflowA
+            - POSTGRES_HOST=postgresA
+        volumes:
+            - ./dags:/usr/local/airflow/dags
+        ports:
+            - "8082:8080"
+        command: webserver
+        healthcheck:
+            test: ["CMD-SHELL", "[ -f /usr/local/airflow/airflow-webserver.pid ]"]
+            interval: 30s
+            timeout: 30s
+            retries: 3

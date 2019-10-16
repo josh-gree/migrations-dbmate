@@ -1,0 +1,8 @@
+version: '2.1'
+services:
+    redshift:
+        image: postgres:9.6
+        environment:
+            - POSTGRES_USER=redshift
+            - POSTGRES_PASSWORD=redshift
+            - POSTGRES_DB=redshift
