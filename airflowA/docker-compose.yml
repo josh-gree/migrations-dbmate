@@ -19,6 +19,7 @@ services:
             - POSTGRES_PASSWORD=airflowA
             - POSTGRES_DB=airflowA
             - POSTGRES_HOST=postgresA
+            - AIRFLOW__WEBSERVER__DAG_DIR_LIST_INTERVAL=10
         volumes:
             - ./dags:/usr/local/airflow/dags
         ports:
